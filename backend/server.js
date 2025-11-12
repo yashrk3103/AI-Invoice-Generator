@@ -7,7 +7,7 @@ const connectDB = require("./config/db");
 const authRoutes = require('./routes/authRoutes')
 const invoiceRoutes = require('./routes/invoiceRoutes')
 const aiRoutes = require('./routes/aiRoutes')
-
+const emailRoutes = require("./routes/emailRoutes");
 const app = express();
 
 // Middleware to handle CORS
@@ -29,6 +29,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api", emailRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
