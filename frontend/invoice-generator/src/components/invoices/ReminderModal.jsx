@@ -14,7 +14,6 @@ const ReminderModal = ({ isOpen, onClose, invoiceId }) => {
   const [clientName, setClientName] = useState('');
   const [isSending, setIsSending] = useState(false);
 
-  // Fetch AI reminder text
   useEffect(() => {
     if (isOpen && invoiceId) {
       const generateReminder = async () => {
@@ -35,7 +34,6 @@ const ReminderModal = ({ isOpen, onClose, invoiceId }) => {
     }
   }, [isOpen, invoiceId, onClose]);
 
-  // Copy to clipboard
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(reminderText);
     setHasCopied(true);
@@ -43,7 +41,6 @@ const ReminderModal = ({ isOpen, onClose, invoiceId }) => {
     setTimeout(() => setHasCopied(false), 2000);
   };
 
-  // Send email to client
   const handleSendEmail = async () => {
     if (!clientEmail || !clientName) {
       toast.error('Please enter client name and email.');
@@ -52,11 +49,14 @@ const ReminderModal = ({ isOpen, onClose, invoiceId }) => {
 
     setIsSending(true);
     try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const businessName = user?.businessName || 'Your Business Name';
+
       await axiosInstance.post("/api/send-reminder", {
         clientEmail,
         clientName,
         reminderText,
-        senderName: "Your Business Name", // optional - can be dynamic from user profile
+        senderName: businessName,
       });
 
       toast.success('Email sent successfully!');
@@ -96,7 +96,6 @@ const ReminderModal = ({ isOpen, onClose, invoiceId }) => {
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Client details */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Client Name
@@ -123,7 +122,6 @@ const ReminderModal = ({ isOpen, onClose, invoiceId }) => {
                 />
               </div>
 
-              {/* AI Reminder Text */}
               <TextareaField
                 name="reminderText"
                 value={reminderText}
@@ -133,7 +131,6 @@ const ReminderModal = ({ isOpen, onClose, invoiceId }) => {
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className="flex justify-end space-x-3 mt-6">
             <Button variant="secondary" onClick={onClose}>
               Close
