@@ -14,15 +14,26 @@ const app = express();
 const frontendUrl = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.replace(/\/$/, "") : null;
 
 const allowedOrigins = [
+  "https://ai-invoice-generator-sage.vercel.app",
   "https://vercel-front-ten.vercel.app",
   "http://localhost:5173",
-  /https:\/\/vercel-front.*\.vercel\.app$/, // Allow Vercel preview URLs
+  "http://localhost:3000",
   frontendUrl,
 ].filter(Boolean);
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+
+      // Check allowed list or any *.vercel.app domain
+      if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app") || /\.vercel\.app$/.test(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
