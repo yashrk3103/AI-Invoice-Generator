@@ -11,13 +11,18 @@ const emailRoutes = require("./routes/emailRoutes");
 const app = express();
 
 // CORS Configuration
+const frontendUrl = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.replace(/\/$/, "") : null;
+
+const allowedOrigins = [
+  "https://vercel-front-ten.vercel.app",
+  "http://localhost:5173",
+  /https:\/\/vercel-front.*\.vercel\.app$/, // Allow Vercel preview URLs
+  frontendUrl,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: [
-      "https://vercel-front-ten.vercel.app",
-      "http://localhost:5173",
-      /https:\/\/vercel-front.*\.vercel\.app$/, // This allows all preview URLs
-    ],
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
@@ -37,25 +42,6 @@ app.get("/", (req, res) => {
       nodeEnv: process.env.NODE_ENV
     }
   });
-});
-
-// Database connection
-let dbConnected = false;
-
-app.use(async (req, res, next) => {
-  if (!dbConnected) {
-    try {
-      await connectDB();
-      dbConnected = true;
-    } catch (error) {
-      console.error('Database connection failed:', error);
-      return res.status(500).json({ 
-        error: "Database connection failed",
-        message: error.message 
-      });
-    }
-  }
-  next();
 });
 
 // Routes
@@ -78,5 +64,13 @@ app.use((err, req, res, next) => {
   });
 });
 
-// CRITICAL: Export for Vercel (DO NOT USE app.listen())
+const PORT = process.env.PORT || 5000;
+
+// Connect to database and start server
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+});
+
 module.exports = app;
