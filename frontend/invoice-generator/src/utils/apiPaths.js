@@ -1,4 +1,4 @@
-export const BASE_URL = import.meta.env.VITE_API_URL || "https://vercel-backend-jet-eta.vercel.app";
+export const BASE_URL = import.meta.env.VITE_API_URL || "https://ai-invoice-generator-kp6k.onrender.com";
 
 export const API_PATHS = {
   AUTH: {
